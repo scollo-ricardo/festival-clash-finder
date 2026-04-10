@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMM 2025 — Festival Planner</title>
+<title>GMM 2026 — Festival Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -404,7 +404,7 @@ header {
 <!-- Name Modal -->
 <div class="modal-overlay" id="nameModal">
   <div class="modal">
-    <h2>GMM 2025</h2>
+    <h2>GMM 2026</h2>
     <p>Enter your name to join the shared festival planner</p>
     <input id="nameInput" type="text" placeholder="Your name..." maxlength="20" autocomplete="off">
     <button onclick="setUser()">Enter the pit ↗</button>
@@ -412,7 +412,7 @@ header {
 </div>
 
 <header>
-  <div class="logo">GRASPOP 2025 <span>FESTIVAL PLANNER</span></div>
+  <div class="logo">GRASPOP 2026 <span>FESTIVAL PLANNER</span></div>
   <div class="header-right">
     <div class="sync-indicator">
       <div class="sync-dot"></div>
@@ -508,10 +508,10 @@ const RAW = {
 };
 
 // ─── SHARED STATE (localStorage as shared layer) ─────────────────────────────
-// Key: "gmm2025_picks"  → {username: {name, color, picks: ["band|day", ...]}}
+// Key: "gmm2026_picks"  → {username: {name, color, picks: ["band|day", ...]}}
 
-const STORAGE_KEY = "gmm2025_picks";
-const USERS_KEY = "gmm2025_users";
+const STORAGE_KEY = "gmm2026_picks";
+const USERS_KEY = "gmm2026_users";
 
 let currentUser = null;
 
@@ -527,7 +527,7 @@ function broadcastChange(){
 
 let ch;
 try {
-  ch = new BroadcastChannel("gmm2025");
+  ch = new BroadcastChannel("gmm2026");
   ch.onmessage = () => { refresh(); };
 } catch(e){ ch = {postMessage:()=>{}}; }
 
