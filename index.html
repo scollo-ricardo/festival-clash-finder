@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GMM 2026 — Festival Planner</title>
+<title>Festival Planner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -16,20 +16,32 @@
 <!-- Name Modal -->
 <div class="modal-overlay" id="nameModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
   <div class="modal">
-    <h2 id="modalTitle">GMM 2026</h2>
-    <p>Enter your name to join the festival planner</p>
+    <h2 id="modalTitle">Festival Planner</h2>
+    <p>Enter your name to get started</p>
     <input id="nameInput" type="text" placeholder="Your name..." maxlength="20" autocomplete="off" aria-label="Your name">
-    <button type="button" id="enterBtn">Enter the pit ↗</button>
+    <button type="button" id="enterBtn">Let's go ↗</button>
   </div>
 </div>
 
 <!-- Toast -->
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<header>
-  <div class="logo">GRASPOP 2026 <span>FESTIVAL PLANNER</span></div>
+<!-- Festival Picker -->
+<div class="festival-picker" id="festivalPicker">
+  <div class="picker-header">
+    <div class="picker-logo">FESTIVAL PLANNER</div>
+    <p class="picker-sub">Choose a festival to start planning</p>
+  </div>
+  <div class="festival-grid" id="festivalGrid"></div>
+</div>
+
+<header style="display:none">
+  <div class="header-left">
+    <button class="back-btn" id="backBtn" aria-label="Back to festival picker">←</button>
+    <div class="logo">FESTIVAL PLANNER</div>
+  </div>
   <div class="header-right">
-    <div class="sync-indicator" aria-label="Sync status: live">
+    <div class="sync-indicator" aria-label="Sync status: local">
       <div class="sync-dot" aria-hidden="true"></div>
       <span id="syncLabel">Local</span>
     </div>
@@ -37,14 +49,13 @@
   </div>
 </header>
 
-<div class="container" id="main">
+<div class="container" id="appMain" style="display:none">
   <div class="main-tabs" role="tablist" aria-label="Views">
     <button class="main-tab active" role="tab" aria-selected="true" id="tab-timeline" data-view="timeline">Timeline</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-browse" data-view="browse">Browse</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-picks" data-view="picks">My picks <span class="badge" id="sharedCount" style="display:none"></span></button>
   </div>
 
-  <!-- TIMELINE -->
   <div id="v-timeline" class="section visible" role="tabpanel" aria-labelledby="tab-timeline">
     <div class="stage-legend" id="legend"></div>
     <div class="day-tabs" id="tlDays" role="tablist" aria-label="Day selector"></div>
@@ -52,7 +63,6 @@
     <div class="tl-mobile" id="tlMobile"></div>
   </div>
 
-  <!-- BROWSE -->
   <div id="v-browse" class="section" role="tabpanel" aria-labelledby="tab-browse">
     <div class="day-tabs" id="brDays" role="tablist" aria-label="Day selector"></div>
     <div class="search-bar">
@@ -63,7 +73,6 @@
     <div class="browse-grid" id="brGrid"></div>
   </div>
 
-  <!-- PICKS -->
   <div id="v-picks" class="section" role="tabpanel" aria-labelledby="tab-picks">
     <div class="picks-header">
       <div class="picks-title">My Picks</div>
@@ -77,6 +86,7 @@
   </div>
 </div>
 
+<script src="js/data.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
