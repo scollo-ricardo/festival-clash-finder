@@ -357,6 +357,27 @@ header {
   font-size: 14px;
 }
 
+.browse-day-header {
+  grid-column: 1 / -1;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 12px 0 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2px;
+}
+.browse-day-header:first-child { padding-top: 0; }
+
+.search-result-count {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.day-tabs.hidden { display: none; }
+
 /* ── PICKS ── */
 .picks-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -563,8 +584,9 @@ header {
     <div class="day-tabs" id="brDays" role="tablist" aria-label="Day selector"></div>
     <div class="search-bar">
       <span class="search-icon" aria-hidden="true">⌕</span>
-      <input type="search" id="searchInput" placeholder="Search bands..." aria-label="Search bands">
+      <input type="search" id="searchInput" placeholder="Search all bands across all days..." aria-label="Search bands across all days">
     </div>
+    <div class="search-result-count" id="searchCount" style="display:none"></div>
     <div class="browse-grid" id="brGrid"></div>
   </div>
 
@@ -983,37 +1005,81 @@ function renderTimeline(){
 // ─── BROWSE ──────────────────────────────────────────────────────────────────
 function renderBrowse(){
   buildDayTabs("brDays");
-  const day = DAYS[activeDay];
   const myPicks = getMyPicks();
   const {clashKeys} = getClashKeys(myPicks);
+  const isSearching = searchQuery.length > 0;
+  const countEl = document.getElementById("searchCount");
+  const dayTabsEl = document.getElementById("brDays");
 
-  const list = [];
-  for(const stage of STAGES) for(const [s,e,name] of (RAW[stage][day]||[])) list.push({name,stage,s,e});
-  list.sort((a,b)=>toMins(a.s)-toMins(b.s));
+  // Hide day tabs when searching globally
+  dayTabsEl.classList.toggle("hidden", isSearching);
 
-  const filtered = searchQuery
-    ? list.filter(b => b.name.toLowerCase().includes(searchQuery) || b.stage.toLowerCase().includes(searchQuery))
-    : list;
+  if(isSearching){
+    // ── Global search across all days ──
+    const allResults = [];
+    for(const day of DAYS){
+      const dayResults = [];
+      for(const stage of STAGES){
+        for(const [s,e,name] of (RAW[stage][day]||[])){
+          if(name.toLowerCase().includes(searchQuery) || stage.toLowerCase().includes(searchQuery)){
+            dayResults.push({name,stage,s,e,day});
+          }
+        }
+      }
+      dayResults.sort((a,b)=>toMins(a.s)-toMins(b.s));
+      if(dayResults.length) allResults.push({day, bands: dayResults});
+    }
 
-  if(filtered.length === 0){
-    document.getElementById("brGrid").innerHTML = `<div class="no-results">${searchQuery ? `No bands matching "${esc(searchQuery)}"` : "No bands this day"}</div>`;
-    return;
+    const totalCount = allResults.reduce((n,g)=>n+g.bands.length, 0);
+
+    if(totalCount === 0){
+      countEl.style.display = "none";
+      document.getElementById("brGrid").innerHTML = `<div class="no-results">No bands matching "${esc(searchQuery)}"</div>`;
+      return;
+    }
+
+    countEl.textContent = `${totalCount} result${totalCount!==1?"s":""} across ${allResults.length} day${allResults.length!==1?"s":""}`;
+    countEl.style.display = "block";
+
+    let html = "";
+    for(const {day, bands} of allResults){
+      html += `<div class="browse-day-header">${day}</div>`;
+      for(const {name,stage,s,e} of bands){
+        const k=bandKey(name,day);
+        const fav=myPicks.has(k), clash=clashKeys.has(k);
+        const cfg=STAGE_CFG[stage];
+        html += renderBandCard({name,stage,s,e,day,k,fav,clash,cfg});
+      }
+    }
+    document.getElementById("brGrid").innerHTML = html;
+
+  } else {
+    // ── Single day view ──
+    countEl.style.display = "none";
+    const day = DAYS[activeDay];
+    const list = [];
+    for(const stage of STAGES) for(const [s,e,name] of (RAW[stage][day]||[])) list.push({name,stage,s,e,day});
+    list.sort((a,b)=>toMins(a.s)-toMins(b.s));
+
+    document.getElementById("brGrid").innerHTML = list.map(({name,stage,s,e})=>{
+      const k=bandKey(name,day);
+      const fav=myPicks.has(k), clash=clashKeys.has(k);
+      const cfg=STAGE_CFG[stage];
+      return renderBandCard({name,stage,s,e,day,k,fav,clash,cfg});
+    }).join("");
   }
+}
 
-  document.getElementById("brGrid").innerHTML = filtered.map(({name,stage,s,e})=>{
-    const k=bandKey(name,day);
-    const fav=myPicks.has(k), clash=clashKeys.has(k);
-    const cfg=STAGE_CFG[stage];
-    return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" data-key="${escAttr(k)}" tabindex="0" role="button" aria-label="${escAttr(name)}, ${stage}, ${s} to ${e}">
-      <div class="stage-bar" style="background:${cfg.color}" aria-hidden="true"></div>
-      <div class="band-info">
-        <div class="band-name">${esc(name)}</div>
-        <div class="band-meta">${stage} · ${s}–${e}</div>
-      </div>
-      ${clash?`<span class="clash-tag" aria-label="Time clash">⚡ clash</span>`:""}
-      <span class="fav-star-btn${fav?" on":""}" aria-hidden="true">${fav?"★":"☆"}</span>
-    </div>`;
-  }).join("");
+function renderBandCard({name,stage,s,e,day,k,fav,clash,cfg}){
+  return `<div class="band-card${fav?" fav":""}${clash?" clash-card":""}" data-key="${escAttr(k)}" tabindex="0" role="button" aria-label="${escAttr(name)}, ${stage}, ${s} to ${e}">
+    <div class="stage-bar" style="background:${cfg.color}" aria-hidden="true"></div>
+    <div class="band-info">
+      <div class="band-name">${esc(name)}</div>
+      <div class="band-meta">${stage} · ${s}–${e}</div>
+    </div>
+    ${clash?`<span class="clash-tag" aria-label="Time clash">⚡ clash</span>`:""}
+    <span class="fav-star-btn${fav?" on":""}" aria-hidden="true">${fav?"★":"☆"}</span>
+  </div>`;
 }
 
 // ─── PICKS ───────────────────────────────────────────────────────────────────
