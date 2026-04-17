@@ -74,7 +74,9 @@ function getClashKeys(picks){
 // ─── USER MANAGEMENT ─────────────────────────────────────────────────────────
 function setUser(){
   const val=document.getElementById("nameInput").value.trim();if(!val)return;
-  currentUser=val;document.getElementById("userBadge").textContent=val;closeModal();
+  currentUser=val;document.getElementById("userBadge").textContent=val;
+  localStorage.setItem("lastUser",currentUser);
+  closeModal();
   const data=loadShared();if(!data[currentUser]){data[currentUser]={name:currentUser,color:getUserColor(currentUser),picks:[]};saveShared(data);}
   render();
 }
@@ -248,4 +250,6 @@ function renderPrices(){
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
 buildFestivalPicker();
-document.getElementById("nameInput").focus();
+const savedUser=localStorage.getItem("lastUser");
+if(savedUser){currentUser=savedUser;document.getElementById("userBadge").textContent=savedUser;}
+else{openModal();}
