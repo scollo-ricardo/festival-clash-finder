@@ -54,6 +54,7 @@
     <button class="main-tab active" role="tab" aria-selected="true" id="tab-timeline" data-view="timeline">Timeline</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-browse" data-view="browse">Browse</button>
     <button class="main-tab" role="tab" aria-selected="false" id="tab-picks" data-view="picks">My picks <span class="badge" id="sharedCount" style="display:none"></span></button>
+    <button class="main-tab" role="tab" aria-selected="false" id="tab-prices" data-view="prices" style="display:none">Prices</button>
   </div>
 
   <div id="v-timeline" class="section visible" role="tabpanel" aria-labelledby="tab-timeline">
@@ -71,6 +72,10 @@
     </div>
     <div class="search-result-count" id="searchCount" style="display:none"></div>
     <div class="browse-grid" id="brGrid"></div>
+  </div>
+
+  <div id="v-prices" class="section" role="tabpanel" aria-labelledby="tab-prices">
+    <div id="pricesContent"></div>
   </div>
 
   <div id="v-picks" class="section" role="tabpanel" aria-labelledby="tab-picks">
