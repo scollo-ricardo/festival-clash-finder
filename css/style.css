@@ -113,12 +113,11 @@ header {
   border: 1.5px solid var(--border2);
   border-radius: 50%;
   color: var(--muted);
-  font-size: 18px;
   width: 34px; height: 34px;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: color .2s, border-color .2s, background .2s;
-  line-height: 1;
+  flex-shrink: 0;
 }
 .back-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(232,197,71,0.08); }
 .back-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
